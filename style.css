@@ -1,0 +1,572 @@
+/* ==========================================================================
+   PixelForge — 8-Bit Retro Canvas Editor
+   Palette derived from the PICO-8 fantasy-console palette.
+   Signature device: stair-stepped "pixel corners" (clip-path) used on every
+   panel, button and swatch, echoing the blocky geometry of pixel art itself.
+   ========================================================================== */
+
+:root {
+  /* ---- Core surfaces ---- */
+  --bg-void: #0a0b10;
+  --bg-panel: #14161f;
+  --bg-panel-raised: #1c1f2c;
+  --bg-panel-raised-hover: #242840;
+  --border-ink: #2c2f42;
+
+  /* ---- Text ---- */
+  --text-primary: #e9e9f2;
+  --text-dim: #7d8199;
+
+  /* ---- PICO-8 derived accents ---- */
+  --accent-cyan: #29adff;
+  --accent-pink: #ff77a8;
+  --accent-red: #ff004d;
+  --accent-lime: #00e436;
+  --accent-amber: #ffa300;
+
+  /* ---- Checkerboard (empty cell) ---- */
+  --checker-a: #20222e;
+  --checker-b: #191b25;
+
+  --notch: 8px;
+  --notch-sm: 4px;
+
+  --font-display: 'Press Start 2P', 'Courier New', monospace;
+  --font-body: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button, input {
+  font-family: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Signature element — pixel-notched corners (used everywhere for cohesion)
+   ========================================================================== */
+
+.pixel-corners {
+  clip-path: polygon(
+    0 var(--notch), var(--notch) var(--notch), var(--notch) 0,
+    calc(100% - var(--notch)) 0, calc(100% - var(--notch)) var(--notch), 100% var(--notch),
+    100% calc(100% - var(--notch)), calc(100% - var(--notch)) calc(100% - var(--notch)), calc(100% - var(--notch)) 100%,
+    var(--notch) 100%, var(--notch) calc(100% - var(--notch)), 0 calc(100% - var(--notch))
+  );
+}
+
+.pixel-corners-sm {
+  clip-path: polygon(
+    0 var(--notch-sm), var(--notch-sm) var(--notch-sm), var(--notch-sm) 0,
+    calc(100% - var(--notch-sm)) 0, calc(100% - var(--notch-sm)) var(--notch-sm), 100% var(--notch-sm),
+    100% calc(100% - var(--notch-sm)), calc(100% - var(--notch-sm)) calc(100% - var(--notch-sm)), calc(100% - var(--notch-sm)) 100%,
+    var(--notch-sm) 100%, var(--notch-sm) calc(100% - var(--notch-sm)), 0 calc(100% - var(--notch-sm))
+  );
+}
+
+/* ==========================================================================
+   Top bar
+   ========================================================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  background: var(--bg-panel);
+  border-bottom: 2px solid var(--border-ink);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar__title h1 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 6px 0;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.topbar__title p {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+}
+
+.topbar__led-strip {
+  display: flex;
+  gap: 8px;
+}
+
+.led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 1px currentColor;
+  animation: led-pulse 2.4s ease-in-out infinite;
+}
+.led--pink { background: var(--accent-pink); color: var(--accent-pink); animation-delay: 0s; }
+.led--cyan { background: var(--accent-cyan); color: var(--accent-cyan); animation-delay: 0.3s; }
+.led--lime { background: var(--accent-lime); color: var(--accent-lime); animation-delay: 0.6s; }
+
+@keyframes led-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Pixel-art brush mark, drawn with box-shadow "sprite" pixels — no images/icons. */
+.pixel-logo {
+  position: relative;
+  width: 3px;
+  height: 3px;
+  background: transparent;
+  box-shadow:
+    9px 0 0 var(--accent-cyan),
+    12px 0 0 var(--accent-cyan),
+    6px 3px 0 var(--accent-cyan),
+    9px 3px 0 var(--accent-pink),
+    3px 6px 0 var(--accent-pink),
+    6px 6px 0 var(--accent-pink),
+    0 9px 0 var(--accent-red),
+    3px 9px 0 var(--accent-pink),
+    0 12px 0 var(--accent-red);
+  margin: 0 12px 12px 0;
+}
+
+/* ==========================================================================
+   App shell / layout
+   ========================================================================== */
+
+.app-shell {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.sidebar {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   Panels
+   ========================================================================== */
+
+.panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--border-ink);
+  padding: 16px;
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--accent-cyan);
+  margin: 0 0 14px 0;
+}
+
+.field-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  position: relative;
+  border: none;
+  background: var(--bg-panel-raised);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    inset -3px -3px 0 rgba(0, 0, 0, 0.4),
+    inset 3px 3px 0 rgba(255, 255, 255, 0.06);
+  transition: background 0.1s ease, transform 0.05s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  background: var(--bg-panel-raised-hover);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 3px 3px 0 rgba(0, 0, 0, 0.4),
+    inset -3px -3px 0 rgba(255, 255, 255, 0.04);
+}
+
+.btn--full {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.btn--full:last-child { margin-bottom: 0; }
+
+.btn--small {
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.btn--danger { color: var(--accent-red); }
+.btn--danger:hover { background: #2a1420; }
+
+.btn--accent { color: var(--accent-lime); }
+.btn--accent:hover { background: #142a1c; }
+
+.btn--file {
+  text-align: center;
+  display: flex;
+}
+
+/* -- Preset row -- */
+.preset-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.btn--preset.is-active {
+  color: var(--accent-cyan);
+  box-shadow:
+    inset 0 0 0 2px var(--accent-cyan),
+    inset 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.custom-size-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-size-row input[type='number'] {
+  width: 100%;
+  min-width: 0;
+  background: var(--bg-void);
+  border: 2px solid var(--border-ink);
+  color: var(--text-primary);
+  padding: 8px 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+}
+
+/* -- Tool row -- */
+.tool-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.btn--tool {
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 4px;
+  font-size: 10px;
+}
+
+.btn--tool.is-active {
+  color: var(--accent-pink);
+  box-shadow:
+    inset 0 0 0 2px var(--accent-pink),
+    inset 3px 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.tool-icon {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: 0.9;
+}
+.tool-icon--brush { clip-path: polygon(0 100%, 40% 40%, 100% 0, 100% 30%, 50% 80%, 20% 100%); }
+.tool-icon--eraser { clip-path: polygon(15% 55%, 55% 15%, 100% 60%, 60% 100%); }
+.tool-icon--fill { clip-path: polygon(50% 0, 90% 45%, 50% 100%, 10% 45%); }
+
+/* -- Checkbox -- */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-cyan);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Colors
+   ========================================================================== */
+
+.color-picker-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.color-picker-row input[type='color'] {
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--border-ink);
+  background: var(--bg-void);
+  cursor: pointer;
+}
+
+.color-picker-swatch {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-ink);
+  justify-self: end;
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.swatch {
+  aspect-ratio: 1;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.swatch.is-active {
+  box-shadow: inset 0 0 0 2px var(--bg-void), 0 0 0 2px var(--accent-cyan);
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   Canvas frame (signature "cartridge" viewport)
+   ========================================================================== */
+
+.canvas-frame {
+  position: relative;
+  background: linear-gradient(160deg, #1b1e2b, #101220);
+  border: 2px solid var(--border-ink);
+  padding: 28px;
+  box-shadow: 0 0 40px -8px rgba(41, 173, 255, 0.25);
+  width: min(70vh, 100%);
+  max-width: 640px;
+}
+
+.canvas-frame__led {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-lime);
+  box-shadow: 0 0 8px 2px var(--accent-lime);
+  animation: led-pulse 2s ease-in-out infinite;
+}
+
+.canvas-frame__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03) 0px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+.canvas-viewport {
+  background: var(--bg-void);
+  border: 2px solid var(--border-ink);
+}
+
+.pixel-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size, 16), 1fr);
+  grid-template-rows: repeat(var(--grid-size, 16), 1fr);
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.pixel-cell {
+  box-sizing: border-box;
+  border: 1px solid var(--border-ink);
+  background-color: transparent;
+  background-image:
+    linear-gradient(45deg, var(--checker-a) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-a) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checker-a) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-a) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+.pixel-grid.hide-gridlines .pixel-cell {
+  border-color: transparent;
+}
+
+/* Painted cells hide the checkerboard by simply having an inline background-color
+   set from JS, which paints over the background-image layer beneath it. */
+
+/* ==========================================================================
+   Status bar
+   ========================================================================== */
+
+.status-bar {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-panel);
+  border: 2px solid var(--border-ink);
+  padding: 8px 16px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.status-chip b {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* ==========================================================================
+   Toast
+   ========================================================================== */
+
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: var(--bg-panel-raised);
+  border-left: 4px solid var(--accent-cyan);
+  padding: 12px 16px;
+  font-size: 12px;
+  max-width: 280px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.is-error { border-left-color: var(--accent-red); }
+.toast.is-success { border-left-color: var(--accent-lime); }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    flex: none;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .canvas-frame {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    padding: 12px 16px;
+  }
+  .sidebar {
+    grid-template-columns: 1fr;
+  }
+  .app-shell {
+    padding: 12px;
+  }
+  .canvas-frame {
+    padding: 16px;
+  }
+}

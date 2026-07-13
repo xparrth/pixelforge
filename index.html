@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PixelForge — 8-Bit Retro Canvas Editor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B9%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="pixel-logo" aria-hidden="true"></span>
+      <div class="topbar__title">
+        <h1>PixelForge</h1>
+        <p>8-BIT RETRO CANVAS EDITOR</p>
+      </div>
+    </div>
+    <div class="topbar__led-strip" aria-hidden="true">
+      <span class="led led--pink"></span>
+      <span class="led led--cyan"></span>
+      <span class="led led--lime"></span>
+    </div>
+  </header>
+
+  <div class="app-shell">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar">
+
+      <!-- Canvas Size -->
+      <section class="panel pixel-corners">
+        <h2 class="panel__title">Canvas Size</h2>
+        <div class="preset-row" id="sizePresets" role="group" aria-label="Canvas size presets">
+          <button type="button" class="btn btn--preset pixel-corners-sm" data-size="8">8×8</button>
+          <button type="button" class="btn btn--preset pixel-corners-sm" data-size="16">16×16</button>
+          <button type="button" class="btn btn--preset pixel-corners-sm" data-size="32">32×32</button>
+          <button type="button" class="btn btn--preset pixel-corners-sm" data-size="64">64×64</button>
+        </div>
+        <div class="custom-size-row">
+          <label for="customSize" class="field-label">Custom</label>
+          <input type="number" id="customSize" min="1" max="64" value="16" />
+          <button type="button" id="applyCustomSize" class="btn btn--small pixel-corners-sm">Apply</button>
+        </div>
+      </section>
+
+      <!-- Color Tools -->
+      <section class="panel pixel-corners">
+        <h2 class="panel__title">Colors</h2>
+        <div class="color-picker-row">
+          <label for="colorPicker" class="field-label">Custom</label>
+          <input type="color" id="colorPicker" value="#ff004d" />
+          <span class="color-picker-swatch pixel-corners-sm" id="activeColorPreview" aria-hidden="true"></span>
+        </div>
+        <div class="palette" id="palette" role="group" aria-label="8-bit color palette"></div>
+      </section>
+
+      <!-- Drawing Tools -->
+      <section class="panel pixel-corners">
+        <h2 class="panel__title">Tools</h2>
+        <div class="tool-row" id="toolRow" role="group" aria-label="Drawing tools">
+          <button type="button" class="btn btn--tool pixel-corners-sm is-active" data-tool="brush" aria-pressed="true">
+            <span class="tool-icon tool-icon--brush" aria-hidden="true"></span>Brush
+          </button>
+          <button type="button" class="btn btn--tool pixel-corners-sm" data-tool="eraser" aria-pressed="false">
+            <span class="tool-icon tool-icon--eraser" aria-hidden="true"></span>Eraser
+          </button>
+          <button type="button" class="btn btn--tool pixel-corners-sm" data-tool="fill" aria-pressed="false">
+            <span class="tool-icon tool-icon--fill" aria-hidden="true"></span>Fill
+          </button>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="gridlinesToggle" checked />
+          <span>Show Gridlines</span>
+        </label>
+      </section>
+
+      <!-- Actions -->
+      <section class="panel pixel-corners">
+        <h2 class="panel__title">Actions</h2>
+        <button type="button" id="clearCanvas" class="btn btn--danger btn--full pixel-corners-sm">Clear Canvas</button>
+      </section>
+
+      <!-- Export / Import -->
+      <section class="panel pixel-corners">
+        <h2 class="panel__title">Export &amp; Import</h2>
+        <button type="button" id="exportPng" class="btn btn--accent btn--full pixel-corners-sm">Export PNG</button>
+        <button type="button" id="exportJson" class="btn btn--full pixel-corners-sm">Export JSON</button>
+        <label class="btn btn--full pixel-corners-sm btn--file" for="importJson">
+          Import JSON
+          <input type="file" id="importJson" accept="application/json,.json" hidden />
+        </label>
+      </section>
+
+    </aside>
+
+    <!-- ============ MAIN CANVAS AREA ============ -->
+    <main class="workspace">
+      <div class="canvas-frame pixel-corners">
+        <span class="canvas-frame__led" aria-hidden="true"></span>
+        <div class="canvas-viewport">
+          <div id="pixelGrid" class="pixel-grid" role="grid" aria-label="Pixel drawing canvas"></div>
+        </div>
+        <div class="canvas-frame__scanlines" aria-hidden="true"></div>
+      </div>
+
+      <div class="status-bar pixel-corners-sm">
+        <span class="status-chip">SIZE <b id="statusSize">16×16</b></span>
+        <span class="status-chip">POS <b id="statusCoords">—</b></span>
+        <span class="status-chip">TOOL <b id="statusTool">Brush</b></span>
+      </div>
+    </main>
+
+  </div>
+
+  <canvas id="exportCanvas" hidden></canvas>
+
+  <div id="toast" class="toast pixel-corners-sm" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

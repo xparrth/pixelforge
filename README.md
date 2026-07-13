@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/logo.png" alt="PixelForge logo" width="520" />
+<img src="./image.png" alt="PixelForge logo" width="520" />
 
 <br />
 
